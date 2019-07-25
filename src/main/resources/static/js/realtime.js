@@ -4,6 +4,8 @@ var itemPaymentRefundChart = null;
 var arr = [];
 var loginCount = 0;
 var userCount = 0;
+var downloadCount = 0;
+var errorCount = 0;
 
 function connect() {
     socket = new SockJS('/dashboard');
@@ -16,11 +18,21 @@ function connect() {
         stompClient.subscribe('/topic/loginCount', function (message) {
             updateLoginCount(message);
         });
-        stompClient.subscribe('/topic/fraud', function (message) {
-            updateFraud(message);
+
+        stompClient.subscribe('/topic/errorCount', function (message) {
+            updateErrorCount(message);
         });
-        stompClient.subscribe('/topic/currencyRevenue', function (message) {
-            updateCurrencyRevenue(message);
+
+        stompClient.subscribe('/topic/downloadCount', function (message) {
+            updateDownloadCount(message);
+        });
+
+        stompClient.subscribe('/topic/segmentCount', function (message) {
+            console.log('Test : ' + message.body);
+            updateSegmentCount(message);
+        });
+        stompClient.subscribe('/topic/usageCount', function (message) {
+            updateUsageCount(message);
         });
         stompClient.subscribe('/topic/clientRevenue', function (message) {
             updateClientRevenue(message);
@@ -42,6 +54,18 @@ function updateUserCount(message) {
     userCount += +message.body;
     console.log(message.body);
     $('#total-customer-error').html(userCount);
+}
+
+function updateErrorCount(message) {
+    errorCount+=+message.body;
+    console.log(message.body);
+    $('#total-errorCount').html(errorCount);
+}
+
+function updateDownloadCount(message) {
+    downloadCount+=+message.body;
+    console.log(message.body);
+    $('#total-downloadCount').html(downloadCount);
 }
 
 function updateLoginCount(message) {
@@ -67,11 +91,12 @@ function updateCurrencyRevenue(message) {
     });
 }
 
-function updateClientRevenue(message) {
+function updateSegmentCount(message) {
     clientRevenueChart.load({
         json: $.parseJSON(message.body)
     });
 }
+
 
 function updateItemPaymentRefund(message) {
     itemPaymentRefundChart.load({
@@ -82,6 +107,55 @@ function updateItemPaymentRefund(message) {
         }
     });
 }
+
+
+function updateUsageCount(message){
+
+    var featureLabels = [];
+    var featurecounts = [];
+
+    var messageBody = $.parseJSON(message.body);
+
+    console.log(messageBody);
+
+    featureLabels = Object.keys(messageBody);
+
+    console.log(featurecounts);
+
+
+    featureLabels.map( f => {featurecounts.push(messageBody[f])});
+
+    console.log('Hi' + featurecounts);
+
+    if ($('#mybarChart').length ){
+
+        var ctx = document.getElementById("mybarChart");
+        var mybarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: featureLabels,
+                datasets: [{
+                    label: '# of clicks',
+                    backgroundColor: "#26B99A",
+                    data: featurecounts
+                }]
+            },
+
+            options: {
+                responsive:true,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+    }
+}
+
 
 $(document).ready(function () {
     connect();
@@ -96,13 +170,6 @@ $(document).ready(function () {
 
     clientRevenueChart = c3.generate({
         bindto: '#client-revenue',
-        tooltip: {
-            format: {
-                value: function (x) {
-                    return '$' + x;
-                }
-            }
-        },
         data: {
             type: 'donut',
             json: {}
