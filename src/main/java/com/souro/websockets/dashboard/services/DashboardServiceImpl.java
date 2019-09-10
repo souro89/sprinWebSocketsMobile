@@ -52,6 +52,13 @@ public class DashboardServiceImpl {
         messagingTemplate.convertAndSend("/topic/segmentCount",segmentCounts);
     }
 
+    @Scheduled(fixedDelay = 30000)
+    public void getErrorCount(){
+        HashMap<String,Integer> randomCounts = new HashMap<>();
+        randomCounts.put("value",randomInt(50));
+        messagingTemplate.convertAndSend("/topic/temperature",randomCounts);
+    }
+
     @Scheduled(fixedDelay = 12000)
     public void getUsageCounts(){
         HashMap<String,Integer> usageCounts = new HashMap<>();

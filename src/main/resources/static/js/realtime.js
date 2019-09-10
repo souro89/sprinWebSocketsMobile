@@ -40,6 +40,9 @@ function connect() {
         stompClient.subscribe('/topic/itemPaymentRefund', function (message) {
             updateItemPaymentRefund(message);
         });
+        // stompClient.subscribe('/topic/temperature', function (message) {
+        //     updateLineChart(message);
+        // });
 
         $.get("/initializeData");
     });
@@ -156,6 +159,132 @@ function updateUsageCount(message){
     }
 }
 
+// function updateLineChart(message){
+//
+//
+//     var ctx = document.getElementById('lineChart').getContext('2d');
+//
+//     var config = {
+//
+//         type : 'line',
+//
+//         data : {
+//
+//             labels : [],
+//
+//             datasets : [ {
+//
+//                 label : 'Temperature',
+//
+//                 backgroudColor : 'rgb(255, 99, 132)',
+//
+//                 borderColor : 'rgb(255, 99, 132)',
+//
+//                 data : [],
+//
+//                 fill : false
+//
+//             } ]
+//
+//         },
+//
+//         options : {
+//
+//             responsive : true,
+//
+//             title : {
+//
+//                 display : true,
+//
+//                 text : 'Temperature'
+//
+//             },
+//
+//             tooltips : {
+//
+//                 mode : 'index',
+//
+//                 intersect : false
+//
+//             },
+//
+//             hover : {
+//
+//                 mode : 'nearest',
+//
+//                 intersect : true
+//
+//             },
+//
+//             scales : {
+//
+//                 xAxes : [ {
+//
+//                     display : true,
+//
+//                     type : 'time',
+//
+//                     time : {
+//
+//                         displayFormats : {
+//
+//                             quarter : 'h:mm:ss a'
+//
+//                         }
+//
+//                     },
+//
+//                     scaleLabel : {
+//
+//                         display : true,
+//
+//                         labelString : 'Time'
+//
+//                     }
+//
+//                 } ],
+//
+//                 yAxes : [ {
+//
+//                     display : true,
+//
+//                     scaleLabel : {
+//
+//                         display : true,
+//
+//                         labelString : 'Value'
+//
+//                     }
+//
+//                 } ]
+//
+//             }
+//
+//         }
+//
+//     };
+//
+//     window.myLine = new Chart(ctx, config);
+//
+//     $('#temperature').text(temperature.body);
+//
+//     /* Push new data On X-Axis of Chart */
+//
+//     config.data.labels.push(new Date());
+//
+//     /* Push new data on Y-Axis of chart */
+//
+//     config.data.datasets.forEach(function(dataset) {
+//
+//         dataset.data.push(temperature.body);
+//
+//     });
+//
+//     window.myLine.update();
+//
+//
+// }
+
 
 $(document).ready(function () {
     connect();
@@ -179,7 +308,7 @@ $(document).ready(function () {
     itemPaymentRefundChart = c3.generate({
         bindto: '#item-payment-refund',
         data: {
-            type: 'bar',
+            type: 'line',
             json: {}
         },
         axis: {
